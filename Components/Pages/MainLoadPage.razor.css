@@ -1,0 +1,22 @@
+﻿.main_page {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+}
+
+.main_page__header {
+    margin-top: 5%;
+    width: 100%;
+    text-align: center;
+    color: white;
+}
+
+.main_page__image {
+    opacity: 70%;
+    position: absolute;
+    width: 70%;
+    bottom: -5%;
+    right: -8%;
+}
