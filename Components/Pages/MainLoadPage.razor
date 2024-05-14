@@ -1,6 +1,33 @@
 ﻿@page "/"
 
 <div class="main_page">
-    <h1 class="main_page__header">Welcome home, master!</h1>
-    <img class="main_page__image" src="images/LoaderLogo.png" />
+    <h1 id="header" class="main_page__header">Добро пожаловать<br />Хозяин!</h1>
+    <button id="test_button" class="test_button" @onclick="showToolTip">Покажись!</button>
 </div>
+
+@code {
+    public async void showToolTip()
+    {
+    }
+}
+
+<script>
+
+    window.setTimeout(function () { document.getElementById('header').classList.add('show'); }, 500);
+    window.setTimeout(function () { document.getElementById('test_button').classList.add('show'); }, 1500);
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
+    let rugatelstva = ['Иди нахуй!', 'Отъебись от меня!', 'Ламберт, Ламберт...', '... хер моржовый', 'Иди тыкай кого-нибудь другого!', 'Убери свои пальцы!', 'Фи.'];
+    let i = 0;
+
+    document.getElementById('test_button').addEventListener('click', function () {
+        if (isShowingTooltip || isHidingTooltip) return;
+        if (i == 7) i = 0;
+        showTooltip(rugatelstva[i]);
+        i++;
+    });
+
+
+</script>

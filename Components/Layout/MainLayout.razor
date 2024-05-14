@@ -1,5 +1,44 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime JS
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
 
 <div class="page">
+    <div class="bg_fade"></div>
+    <div id="toolTipImg" class="toolTip">
+        <div class="toolTipText" id="toolTipText"></div>
+        <img class="toolTipImg" src="images/LoaderLogo.png" />
+    </div>
     @Body
 </div>
+
+
+<script>
+    let isShowingTooltip = false;
+    let isHidingTooltip = false;
+
+    function showTooltip(message) {
+        if (isShowingTooltip) return;
+        isShowingTooltip = true;
+        document.getElementById('toolTipImg').style.right = '-8%';
+        document.getElementById('toolTipText').innerText = message;
+        document.getElementById('toolTipText').style.display = message && message != '' ? 'block' : 'none';
+        window.setTimeout(function () { hideTooltip(); }, 2000);
+    }
+
+    document.getElementById('toolTipImg').addEventListener('click', function () { hideTooltip(); });
+
+    function hideTooltip() {
+        if (isHidingTooltip) return;
+        isHidingTooltip = true;
+        document.getElementById('toolTipImg').style.right = '-100%';
+        document.getElementById('toolTipText').innerText = '';
+        document.getElementById('toolTipText').style.display = 'none';
+
+        window.setTimeout(function () { isShowingTooltip = false; isHidingTooltip = false; }, 1300);
+    }
+</script>

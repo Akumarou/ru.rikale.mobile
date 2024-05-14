@@ -2,21 +2,47 @@
     height: 100vh;
     width: 100vw;
     display: flex;
-    position: relative;
     flex-direction: column;
 }
 
 .main_page__header {
+    opacity: 0;
     margin-top: 5%;
     width: 100%;
     text-align: center;
     color: white;
 }
 
-.main_page__image {
-    opacity: 70%;
-    position: absolute;
-    width: 70%;
-    bottom: -5%;
-    right: -8%;
+.test_button {
+    opacity: 0;
+    background: linear-gradient(90deg, rgba(157,110,208,1) 26%, rgba(184,67,242,1) 100%);
+    border: 2px groove midnightblue;
+    border-radius: 15px;
+    color: white;
+    width: fit-content;
+    height: fit-content;
+    padding: 5px 10px;
+    margin: 0 auto;
+    transition: background 0.3s ease-in-out;
+}
+
+    .test_button:active {
+        padding: 6px 10px 4px 10px;
+        background: linear-gradient(90deg, rgba(139,99,182,1) 26%, rgba(165,78,208,1) 100%);
+    }
+
+.hide {
+    opacity: 0;
+    transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
+}
+
+.show {
+    opacity: 1;
+    transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
 }
