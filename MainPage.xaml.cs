@@ -6,5 +6,12 @@
         {
             InitializeComponent();
         }
+
+        protected override bool OnBackButtonPressed()
+        {
+
+            return App.NeedToBlockBackButton ? true : base.OnBackButtonPressed();
+        }
+
     }
 }

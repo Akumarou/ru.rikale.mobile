@@ -1,3 +1,7 @@
+$d: 60vmin;
+$f: .5;
+$t: 1s;
+
 * {
     font-family: "Noto Sans", sans-serif;
     font-optical-sizing: auto;
@@ -20,24 +24,26 @@ body {
 }
 
 
-.toolTip {
+.toolTip_first {
     z-index: 1;
-    opacity: 70%;
+    opacity: 85%;
     position: absolute;
-    bottom: -8%;
+    bottom: 0;
     right: -100%;
     transition: right 1s ease-in-out;
     display: flex;
     flex-direction: column;
 }
 
-.toolTipImg {
+.toolTipImg_first {
+    min-width: 60%;
+    max-width: 60%;
     width: 60%;
     align-self: end;
     justify-self: end;
 }
 
-.toolTipText {
+.toolTipText_first {
     width: 60%;
     align-self: center;
     justify-self: start;
@@ -47,4 +53,97 @@ body {
     background-color: whitesmoke;
     border: 1px solid black;
     border-radius: 15px;
+}
+
+
+.toolTip_second {
+    z-index: 1;
+    opacity: 85%;
+    position: absolute;
+    bottom: 0;
+    left: -120%;
+    transition: left 1s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolTipImg_second {
+    min-width: 60%;
+    max-width: 60%;
+    width: 60%;
+    align-self: start;
+    transform: scale(-1, 1);
+    justify-self: start;
+}
+
+.toolTipText_second {
+    width: 60%;
+    align-self: center;
+    justify-self: start;
+    width: fit-content;
+    height: fit-content;
+    padding: 20px 30px;
+    background-color: whitesmoke;
+    border: 1px solid black;
+    border-radius: 15px;
+}
+
+
+.toolTip_third {
+    z-index: 1;
+    position: absolute;
+    left: 0;
+    top: -100%;
+    transition: top 1s ease-in-out;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.toolTipImg_third {
+    min-width: 60%;
+    max-width: 60%;
+    width: 60%;
+    align-self: start;
+    justify-self: start;
+    transform: rotate(180deg);
+}
+
+.toolTipText_third {
+    width: 60%;
+    align-self: center;
+    justify-self: end;
+    width: fit-content;
+    height: fit-content;
+    padding: 20px 30px;
+    background-color: whitesmoke;
+    border: 1px solid black;
+    border-radius: 15px;
+}
+
+.loader {
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.5s linear,opacity 0.5s linear;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.4);
+    z-index: 9999;
+}
+
+.loader-visible {
+    display: flex;
+}
+
+.loader-visible__animation {
+    visibility: visible;
+    opacity: 1;
+}
+
+.loader-image {
+    width: 70vw;
+    height: fit-content;
 }

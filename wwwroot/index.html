@@ -9,13 +9,42 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="ru.rikale.mobile.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <style>
+        #app {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            background-image: url(/images/BG.jpg);
+            background-size: contain;
+        }
+
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255,255,255,0.4);
+            z-index: 9999;
+        }
+
+        .loader-image {
+            width: 70vw;
+            height: fit-content;
+        }
+    </style>
 </head>
 
 <body>
 
     <div class="status-bar-safe-area"></div>
 
-    <div id="app" style="height: 100vh; width: 100vw; background-image: url(/images/BG.jpg); background-size: contain;">Loading...</div>
+    <div id="app">
+        <div class="loader" id="loader">
+            <img class="loader-image" src="images/Loader.gif" />
+        </div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.

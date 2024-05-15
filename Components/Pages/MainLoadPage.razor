@@ -1,33 +1,32 @@
 ﻿@page "/"
+@using static ru.rikale.mobile.Components.Layout.MainLayout
+@inject IJSRuntime JS
 
 <div class="main_page">
     <h1 id="header" class="main_page__header">Добро пожаловать<br />Хозяин!</h1>
     <button id="test_button" class="test_button" @onclick="showToolTip">Покажись!</button>
+    <button id="test_button3" class="test_button" @onclick="showToolTip2">Покажись!</button>
+    <button id="test_button2" class="test_button" @onclick="showLoader">Тест лоадера!</button>
 </div>
 
 @code {
-    public async void showToolTip()
+    public void showToolTip()
     {
+        AppRenderer.ShowAlertAsync("test", 2000);
+    }
+    public void showToolTip2()
+    {
+        AppRenderer.ShowAlertAsync("test");
+    }
+    public void showLoader()
+    {
+        AppRenderer.ShowLoader(5000);
     }
 }
 
 <script>
-
     window.setTimeout(function () { document.getElementById('header').classList.add('show'); }, 500);
-    window.setTimeout(function () { document.getElementById('test_button').classList.add('show'); }, 1500);
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-    }
-
-    let rugatelstva = ['Иди нахуй!', 'Отъебись от меня!', 'Ламберт, Ламберт...', '... хер моржовый', 'Иди тыкай кого-нибудь другого!', 'Убери свои пальцы!', 'Фи.'];
-    let i = 0;
-
-    document.getElementById('test_button').addEventListener('click', function () {
-        if (isShowingTooltip || isHidingTooltip) return;
-        if (i == 7) i = 0;
-        showTooltip(rugatelstva[i]);
-        i++;
-    });
-
-
+    window.setTimeout(function () { document.getElementById('test_button').classList.add('show'); }, 1000);
+    window.setTimeout(function () { document.getElementById('test_button3').classList.add('show'); }, 1000);
+    window.setTimeout(function () { document.getElementById('test_button2').classList.add('show'); }, 1000);
 </script>

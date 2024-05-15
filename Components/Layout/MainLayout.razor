@@ -9,36 +9,156 @@
 
 <div class="page">
     <div class="bg_fade"></div>
-    <div id="toolTipImg" class="toolTip">
-        <div class="toolTipText" id="toolTipText"></div>
-        <img class="toolTipImg" src="images/LoaderLogo.png" />
+    <div id="toolTipImg_0" class="toolTip_first">
+        <div class="toolTipText_first" id="toolTipText_0"></div>
+        <img class="toolTipImg_first" id="toolTipImgSrc_0" src="images/ToolTipLogo_1.png" />
+    </div>
+    <div id="toolTipImg_1" class="toolTip_second">
+        <div class="toolTipText_second" id="toolTipText_1"></div>
+        <img class="toolTipImg_second" id="toolTipImgSrc_1" src="images/ToolTipLogo_2.png" />
+    </div>
+    <div id="toolTipImg_2" class="toolTip_third">
+        <div class="toolTipText_third" id="toolTipText_2"></div>
+        <img class="toolTipImg_third" id="toolTipImgSrc_2" src="images/ToolTipLogo_3.png" />
+    </div>
+
+    <div class="loader" id="loader">
+        <img class="loader-image" src="images/Loader.gif" />
     </div>
     @Body
 </div>
 
 
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        AppRenderer.SetRenderer(this);
+    }
+
+    public static class AppRenderer
+    {
+        private static MainLayout? Renderer { get; set; }
+
+        public static void SetRenderer(MainLayout renderer) { if (renderer != null) Renderer = renderer; }
+
+        public static void ShowAlertAsync(string message, int timeout = 0)
+        {
+            Renderer?.ShowAlertAsync(message, timeout);
+        }
+
+        public static void ShowLoader(int timeout = 0)
+        {
+            Renderer?.ShowLoader(timeout);
+        }
+
+        public static void HideAlertAsync()
+        {
+            Renderer?.HideAlertAsync();
+        }
+    }
+
+    [JSInvokable]
+    public static void UnlockBackButton()
+    {
+        App.NeedToBlockBackButton = false;
+    }
+
+    public async Task ShowLoader(int timeout)
+    {
+        App.NeedToBlockBackButton = true;
+        await JS.InvokeVoidAsync("showLoader", timeout);
+    }
+
+    public async Task HideLoader()
+    {
+        await JS.InvokeVoidAsync("hideLoader");
+    }
+
+    public async Task ShowAlertAsync(string message, int timeout)
+    {
+        await JS.InvokeVoidAsync("showTooltip", message, timeout);
+    }
+
+    public async Task HideAlertAsync()
+    {
+        await JS.InvokeVoidAsync("hideTooltip");
+    }
+
+    [JSInvokable]
+    public static Task<int> GetRandomInt(int max = int.MaxValue)
+    {
+        return Task.FromResult((new Random()).Next(0, max));
+    }
+}
+
 <script>
     let isShowingTooltip = false;
     let isHidingTooltip = false;
+    let isLoaderActive = false;
+    let currentActiveTooltip = 0;
 
-    function showTooltip(message) {
-        if (isShowingTooltip) return;
-        isShowingTooltip = true;
-        document.getElementById('toolTipImg').style.right = '-8%';
-        document.getElementById('toolTipText').innerText = message;
-        document.getElementById('toolTipText').style.display = message && message != '' ? 'block' : 'none';
-        window.setTimeout(function () { hideTooltip(); }, 2000);
+    function showLoader(timeout) {
+        if (isLoaderActive) return;
+        isLoaderActive = true;
+        document.getElementById('loader').classList.add('loader-visible');
+        window.setTimeout(function () { document.getElementById('loader').classList.add('loader-visible__animation'); }, 10);
+        if (timeout > 0)
+            window.setTimeout(function () { hideLoader(); }, timeout);
+    }
+    function hideLoader() {
+        document.getElementById('loader').classList.remove('loader-visible__animation');
+        window.setTimeout(function () {
+            DotNet.invokeMethodAsync('ru.rikale.mobile', 'UnlockBackButton');
+            document.getElementById('loader').classList.remove('loader-visible');
+            isLoaderActive = false;
+        }, 500);
     }
 
-    document.getElementById('toolTipImg').addEventListener('click', function () { hideTooltip(); });
+
+    function showTooltip(message, timeout) {
+        if (currentActiveTooltip == undefined || isHidingTooltip == undefined || isShowingTooltip == undefined || isShowingTooltip)
+            return;
+        isShowingTooltip = true;
+
+        DotNet.invokeMethodAsync('ru.rikale.mobile', 'GetRandomInt', 3)
+            .then(imageId => {
+                imageId = imageId + 1;
+                DotNet.invokeMethodAsync('ru.rikale.mobile', 'GetRandomInt', 3)
+                    .then(toolTipId => {
+                        currentActiveTooltip = toolTipId;
+                        document.getElementById('toolTipImgSrc_' + currentActiveTooltip).src = "images/ToolTipLogo_" + imageId + ".gif";
+                        if (currentActiveTooltip == 0)
+                            document.getElementById('toolTipImg_0').style.right = '0';
+                        if (currentActiveTooltip == 1)
+                            document.getElementById('toolTipImg_1').style.left = '0';
+                        if (currentActiveTooltip == 2)
+                            document.getElementById('toolTipImg_2').style.top = '0';
+                        document.getElementById('toolTipText_' + currentActiveTooltip).innerText = message;
+                        document.getElementById('toolTipText_' + currentActiveTooltip).style.display = message && message != '' ? 'block' : 'none';
+                        if (timeout > 0)
+                            window.setTimeout(function () { hideTooltip(); }, timeout);
+                    });
+            });
+    }
 
     function hideTooltip() {
-        if (isHidingTooltip) return;
+        if (currentActiveTooltip == undefined || isHidingTooltip == undefined || isShowingTooltip == undefined || isHidingTooltip)
+            return;
         isHidingTooltip = true;
-        document.getElementById('toolTipImg').style.right = '-100%';
-        document.getElementById('toolTipText').innerText = '';
-        document.getElementById('toolTipText').style.display = 'none';
+        if (currentActiveTooltip == 0)
+            document.getElementById('toolTipImg_0').style.right = '-100%';
+        if (currentActiveTooltip == 1)
+            document.getElementById('toolTipImg_1').style.left = '-120%';
+        if (currentActiveTooltip == 2)
+            document.getElementById('toolTipImg_2').style.top = '-100%';
+        document.getElementById('toolTipText_' + currentActiveTooltip).innerText = '';
+        document.getElementById('toolTipText_' + currentActiveTooltip).style.display = 'none';
 
-        window.setTimeout(function () { isShowingTooltip = false; isHidingTooltip = false; }, 1300);
+        window.setTimeout(function () { isShowingTooltip = false; isHidingTooltip = false; }, 700);
     }
+
+    document.getElementById('toolTipImg_0').addEventListener('click', function () { hideTooltip(); });
+    document.getElementById('toolTipImg_1').addEventListener('click', function () { hideTooltip(); });
+    document.getElementById('toolTipImg_2').addEventListener('click', function () { hideTooltip(); });
 </script>
