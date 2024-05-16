@@ -1,28 +1,154 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">RikaleAw</a>
+﻿@using static ru.rikale.mobile.Components.Layout.MainLayout
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+
+<div class="top-right-slide">
+    <div @onclick='()=>RedirectTo("/")' class="inner-container-top">
+        <a href="#" class="nav-links nav-links-black">NOTIFICATIONS</a>
+    </div>
+</div>
+<div class="middle-right-slide">
+    <div @onclick='()=>RedirectTo("/tasks")' class="inner-container-middle">
+        <a href="#" class="nav-links nav-links-black">TASKS</a>
+    </div>
+</div>
+<div class="bottom-right-slide">
+    <div @onclick='()=>RedirectTo("/timers")' class="inner-container-bottom">
+        <a href="#" class="nav-links nav-links-black">DAILY</a>
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <svg src="images/notifications_ico.svg" class="bi" /> Напоминалки
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tasks">
-                <svg src="images/tasklists_ico.svg" class="bi" /> Задачки
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="timers">
-                <svg src="images/timers_ico.svg" class="bi" /> Дейлики
-            </NavLink>
-        </div>
-    </nav>
+<div class="top-left-slide">
+    <div class="inner-container-left-top">
+        <a href="#" class="nav-links">-DISABLED-</a>
+    </div>
+</div>
+<div class="bottom-left-slide">
+    <div class="inner-container-left-bottom">
+        <a href="#" class="nav-links">-DISABLED-</a>
+    </div>
 </div>
 
+<div class="menu-btn">
+    <div class="eks-one"></div>
+    <div class="eks-two"></div>
+    <div class="eks-three"></div>
+</div>
+
+<h1 class="logo">RikaleAW App</h1>
+
+<div class="text"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/gsap.min.js"></script>
+
+@code {
+    private static NavigationManager NM { get; set; }
+
+    public async Task RedirectTo(string url)
+    {
+        NM = NavigationManager;
+        await JS.InvokeVoidAsync("redirectTo", url);
+    }
+
+    [JSInvokable]
+    public static void ContinueRedirection(string url)
+    {
+        NM?.NavigateTo(url);
+    }
+}
+
+
+<script>
+    const menu = document.querySelector('.menu-btn');
+    const topLeftSlider = document.querySelector('.top-left-slide');
+    const bottomLeftSlider = document.querySelector('.bottom-left-slide');
+
+    const topRightSlider = document.querySelector('.top-right-slide');
+    const middleRightSlider = document.querySelector('.middle-right-slide');
+    const bottomRightSlider = document.querySelector('.bottom-right-slide');
+
+    const eksOne = document.querySelector('.eks-one');
+    const eksTwo = document.querySelector('.eks-two');
+    const eksThree = document.querySelector('.eks-three');
+
+    var isOpen = false;
+
+    function redirectTo(url) {
+        window.setTimeout(() => {
+            menuClicked();
+        }, 600);
+        window.setTimeout(() => {
+            DotNet.invokeMethodAsync('ru.rikale.mobile', 'ContinueRedirection', url);
+        }, 700);
+    }
+
+    menu.addEventListener('click', () => {
+        menuClicked();
+    })
+
+    function menuClicked() {
+        topLeftSlider.classList.toggle('top-left-slide-show');
+        bottomLeftSlider.classList.toggle('bottom-left-slide-show');
+        topRightSlider.classList.toggle('top-right-slide-show');
+        middleRightSlider.classList.toggle('middle-right-slide-show');
+        bottomRightSlider.classList.toggle('bottom-right-slide-show');
+        eksTwo.classList.toggle('eks-two-fade');
+
+        const tl = gsap.timeline();
+        const tlEksThree = gsap.timeline();
+
+        if (!isOpen) {
+            tl.to('.eks-one', {
+                y: isOpen ? 0 : 9,
+            })
+                .to('.eks-one', {
+                    rotate: isOpen ? 0 : 45
+                })
+
+            tlEksThree.to('.eks-three', {
+                y: isOpen ? 0 : -9,
+            })
+                .to('.eks-three', {
+                    rotate: isOpen ? 0 : -45
+                })
+        }
+        else {
+            tl.to('.eks-one', {
+                rotate: isOpen ? 0 : 45,
+            })
+                .to('.eks-one', {
+                    y: isOpen ? 0 : 9,
+                })
+
+            tlEksThree.to('.eks-three', {
+                rotate: isOpen ? 0 : -45
+            })
+                .to('.eks-three', {
+                    y: isOpen ? 0 : -9
+                })
+        }
+
+        isOpen = !isOpen
+    }
+
+    gsap.from('.simple', {
+        x: -100,
+        duration: 1
+    })
+    gsap.from('.menu', {
+        x: -100,
+        duration: 1.2,
+        delay: 0.3,
+        opacity: 0
+    })
+    gsap.from('.navi', {
+        y: -500,
+        duration: 2.,
+        delay: 0.4,
+        opacity: 0
+    })
+</script>

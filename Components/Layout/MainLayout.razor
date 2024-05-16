@@ -10,9 +10,7 @@
     <img class="loader-image" src="images/Loader.gif" />
 </div>
 
-<div class="sidebar">
-    <NavMenu />
-</div>
+<NavMenu />
 
 <div class="page">
     @Body
@@ -43,7 +41,7 @@
         base.OnAfterRender(firstRender);
         AppRenderer.SetRenderer(this);
         if (firstRender)
-            AppRenderer.ShowAlertAsync("Приветствую тебя, Хозяин!<br />С возвращением!", 3000, 1);
+            AppRenderer.ShowAlertAsync("Приветствую тебя, Хозяин!<br />С возвращением!", 4500, 1);
     }
 
     public static class AppRenderer
@@ -153,9 +151,9 @@
 
 <script>
     function showLoader() {
+        document.getElementById('app').classList.add('app_loader');
         document.getElementById('loader').classList.add('loader-visible');
         window.setTimeout(function () { document.getElementById('loader').classList.add('loader-visible__animation'); }, 10);
-        //window.getElementById('app').classList.add('app_loader');
     }
 
     function hideLoader() {
@@ -164,7 +162,7 @@
 
     function closeLoader() {
         document.getElementById('loader').classList.remove('loader-visible');
-        //window.getElementById('app').classList.remove('app_loader');
+        document.getElementById('app').classList.remove('app_loader');
     }
 
     function showTooltip(message, imageId) {
