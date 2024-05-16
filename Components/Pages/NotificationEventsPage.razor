@@ -1,0 +1,35 @@
+﻿@page "/"
+@using static ru.rikale.mobile.Components.Layout.MainLayout
+@inject IJSRuntime JS
+
+<div class="content">
+    <h1 class="hide header" id="header">Напоминалки</h1>
+    <button id="button" class="button hide" @onclick="showAlert">Гиде мордашка?</button>
+    <button id="button1" class="button hide" @onclick="showLoader">Тыкни лоадер</button>
+</div>
+
+@code {
+    public void showAlert()
+    {
+        AppRenderer.ShowAlertAsync("А я тутачки!", 3000);
+    }
+    public void showLoader()
+    {
+        AppRenderer.ShowLoader(3000);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+            MainThread.BeginInvokeOnMainThread(async () => await JS.InvokeVoidAsync("slowAppear"));
+    }
+}
+
+<script>
+    function slowAppear() {
+        window.setTimeout(function () { document.getElementById('header').classList.add('show'); }, 500);
+        window.setTimeout(function () { document.getElementById('button').classList.add('show'); }, 750);
+        window.setTimeout(function () { document.getElementById('button1').classList.add('show'); }, 1000);
+    }
+</script>

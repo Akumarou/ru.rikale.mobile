@@ -1,0 +1,56 @@
+﻿.content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 10%;
+    align-items: center;
+}
+
+.header {
+    color: black;
+    text-align: center;
+    background-color: beige;
+    border-radius: 8px;
+    padding: 10px 0;
+    width: 90%;
+    font-size: 13px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
+}
+
+.button {
+    width: 90%;
+    color: white;
+    background-color: rgb(185,180,199);
+    height: fit-content;
+    border: none;
+    border-radius: 8px;
+    padding: 20px 0;
+    font-size: 15px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
+    transition: box-shadow 2s ease-in-out,color 2s ease-in-out,text-shadow 2s ease-in-out, padding 2s ease-in-out;
+}
+
+    .button:active {
+        padding: 21px 0 19px 0;
+        color: darkslateblue;
+        box-shadow: 0 0 5px darkslateblue;
+        text-shadow: 0 0 5px darkslateblue;
+    }
+
+.hide {
+    opacity: 0;
+    transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
+}
+
+.show {
+    opacity: 1;
+    transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
+}

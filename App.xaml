@@ -7,8 +7,11 @@
     <Application.Resources>
         <ResourceDictionary>
 
-            <Color x:Key="PageBackgroundColor">White</Color>
-            <Color x:Key="PrimaryTextColor">White</Color>
+            <Color x:Key="PageBackgroundColor">#5C5470</Color>
+            <Color x:Key="PageEndBackgroundColor">#B9B4C7</Color>
+            <Color x:Key="BarBackgroundColor">#352F44</Color>
+            <Color x:Key="FrameBackgroundColor">#FAF0E6</Color>
+            <Color x:Key="PrimaryTextColor">Black</Color>
 
         </ResourceDictionary>
     </Application.Resources>

@@ -1,0 +1,28 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">RikaleAw</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <svg src="images/notifications_ico.svg" class="bi" /> Напоминалки
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="tasks">
+                <svg src="images/tasklists_ico.svg" class="bi" /> Задачки
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="timers">
+                <svg src="images/timers_ico.svg" class="bi" /> Дейлики
+            </NavLink>
+        </div>
+    </nav>
+</div>
+

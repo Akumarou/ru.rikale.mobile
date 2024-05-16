@@ -6,34 +6,44 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
+<div class="loader" id="loader">
+    <img class="loader-image" src="images/Loader.gif" />
+</div>
+
+<div class="sidebar">
+    <NavMenu />
+</div>
 
 <div class="page">
-    <div class="bg_fade"></div>
-    <div id="toolTipImg_0" class="toolTip_first">
-        <div class="toolTipText_first" id="toolTipText_0"></div>
-        <img class="toolTipImg_first" id="toolTipImgSrc_0" src="images/ToolTipLogo_1.png" />
-    </div>
-    <div id="toolTipImg_1" class="toolTip_second">
-        <div class="toolTipText_second" id="toolTipText_1"></div>
-        <img class="toolTipImg_second" id="toolTipImgSrc_1" src="images/ToolTipLogo_2.png" />
-    </div>
-    <div id="toolTipImg_2" class="toolTip_third">
-        <div class="toolTipText_third" id="toolTipText_2"></div>
-        <img class="toolTipImg_third" id="toolTipImgSrc_2" src="images/ToolTipLogo_3.png" />
-    </div>
-
-    <div class="loader" id="loader">
-        <img class="loader-image" src="images/Loader.gif" />
-    </div>
     @Body
+</div>
+
+<div class="toolTip" id="toolTipImg">
+    <div class="toolTipText" id="toolTipText"></div>
+    <img class="toolTipImg" id="toolTipImgSrc" src="images/ToolTipLogo_1.gif" />
 </div>
 
 
 @code {
+    private static bool isHidingTooltip { get; set; }
+    private static bool isShowingTooltip { get; set; }
+    private static bool isShowingLoader { get; set; }
+    private static bool isOpeningTooltip { get; set; }
+    private static bool isSetClosingAlertTimer { get; set; }
+    private static System.Timers.Timer TimeoutClosingAlertTimer { get; set; }
+    private static System.Timers.Timer TimeoutClosingLoaderTimer { get; set; }
+    private static System.Timers.Timer OpeningAlertTimer { get; set; }
+    private static System.Timers.Timer ClosingAlertTimer { get; set; }
+    private static System.Timers.Timer ClosingLoaderTimer { get; set; }
+    private static Thread CloseAlert { get; set; }
+    private static Thread ClosingAlert { get; set; }
+
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         AppRenderer.SetRenderer(this);
+        if (firstRender)
+            AppRenderer.ShowAlertAsync("Приветствую тебя, Хозяин!<br />С возвращением!", 3000, 1);
     }
 
     public static class AppRenderer
@@ -42,9 +52,9 @@
 
         public static void SetRenderer(MainLayout renderer) { if (renderer != null) Renderer = renderer; }
 
-        public static void ShowAlertAsync(string message, int timeout = 0)
+        public static void ShowAlertAsync(string message, int timeout = 0, int imageId = 0)
         {
-            Renderer?.ShowAlertAsync(message, timeout);
+            Renderer?.ShowAlertAsync(message, timeout, imageId > 0 ? imageId : (new Random()).Next(1, 4));
         }
 
         public static void ShowLoader(int timeout = 0)
@@ -58,107 +68,117 @@
         }
     }
 
-    [JSInvokable]
-    public static void UnlockBackButton()
+    private static void SetTimer(System.Timers.Timer timer, int timeout, Action action)
     {
-        App.NeedToBlockBackButton = false;
+        timer = new System.Timers.Timer(timeout);
+        timer.Elapsed += (s, e) =>
+        {
+            action.Invoke();
+            DisposeTimer(timer);
+        };
+        timer.Enabled = true;
+        timer.Start();
+    }
+
+    private static void DisposeTimer(System.Timers.Timer timer)
+    {
+        try
+        {
+            timer.Stop();
+            timer.Dispose();
+            timer.Close();
+        }
+        catch (Exception)
+        {
+            Console.WriteLine();
+        }
     }
 
     public async Task ShowLoader(int timeout)
     {
+        if (isShowingLoader) return;
         App.NeedToBlockBackButton = true;
-        await JS.InvokeVoidAsync("showLoader", timeout);
+        isShowingLoader = true;
+        await JS.InvokeVoidAsync("showLoader");
+        if (timeout > 500)
+            SetTimer(TimeoutClosingLoaderTimer, timeout, async () => { await HideLoader(); });
     }
 
     public async Task HideLoader()
     {
+        if (!isShowingLoader) return;
         await JS.InvokeVoidAsync("hideLoader");
+        SetTimer(ClosingLoaderTimer, 500, async () =>
+        {
+            App.NeedToBlockBackButton = false;
+            await JS.InvokeVoidAsync("closeLoader");
+            isShowingLoader = false;
+        });
     }
 
-    public async Task ShowAlertAsync(string message, int timeout)
+    public async Task ShowAlertAsync(string message, int timeout, int imageId)
     {
-        await JS.InvokeVoidAsync("showTooltip", message, timeout);
+        if (isShowingTooltip || isOpeningTooltip)
+            return;
+        isShowingTooltip = isOpeningTooltip = true;
+        if (timeout > 700)
+        {
+            isSetClosingAlertTimer = true;
+            SetTimer(TimeoutClosingAlertTimer, timeout, HideAlert);
+        }
+        await JS.InvokeVoidAsync("showTooltip", message, imageId);
+        SetTimer(OpeningAlertTimer, 700, () => { isOpeningTooltip = false; });
     }
 
     public async Task HideAlertAsync()
     {
+        if (isHidingTooltip || isOpeningTooltip || !isShowingTooltip)
+            return;
+        isHidingTooltip = true;
+        if (isSetClosingAlertTimer)
+        {
+            isSetClosingAlertTimer = false;
+            DisposeTimer(TimeoutClosingAlertTimer);
+        }
         await JS.InvokeVoidAsync("hideTooltip");
+        SetTimer(ClosingAlertTimer, 700, () => { isHidingTooltip = isShowingTooltip = false; });
     }
 
     [JSInvokable]
-    public static Task<int> GetRandomInt(int max = int.MaxValue)
+    public static void HideAlert()
     {
-        return Task.FromResult((new Random()).Next(0, max));
+        MainThread.BeginInvokeOnMainThread(AppRenderer.HideAlertAsync);
     }
 }
 
 <script>
-    let isShowingTooltip = false;
-    let isHidingTooltip = false;
-    let isLoaderActive = false;
-    let currentActiveTooltip = 0;
-
-    function showLoader(timeout) {
-        if (isLoaderActive) return;
-        isLoaderActive = true;
+    function showLoader() {
         document.getElementById('loader').classList.add('loader-visible');
         window.setTimeout(function () { document.getElementById('loader').classList.add('loader-visible__animation'); }, 10);
-        if (timeout > 0)
-            window.setTimeout(function () { hideLoader(); }, timeout);
+        //window.getElementById('app').classList.add('app_loader');
     }
+
     function hideLoader() {
         document.getElementById('loader').classList.remove('loader-visible__animation');
-        window.setTimeout(function () {
-            DotNet.invokeMethodAsync('ru.rikale.mobile', 'UnlockBackButton');
-            document.getElementById('loader').classList.remove('loader-visible');
-            isLoaderActive = false;
-        }, 500);
     }
 
+    function closeLoader() {
+        document.getElementById('loader').classList.remove('loader-visible');
+        //window.getElementById('app').classList.remove('app_loader');
+    }
 
-    function showTooltip(message, timeout) {
-        if (currentActiveTooltip == undefined || isHidingTooltip == undefined || isShowingTooltip == undefined || isShowingTooltip)
-            return;
-        isShowingTooltip = true;
-
-        DotNet.invokeMethodAsync('ru.rikale.mobile', 'GetRandomInt', 3)
-            .then(imageId => {
-                imageId = imageId + 1;
-                DotNet.invokeMethodAsync('ru.rikale.mobile', 'GetRandomInt', 3)
-                    .then(toolTipId => {
-                        currentActiveTooltip = toolTipId;
-                        document.getElementById('toolTipImgSrc_' + currentActiveTooltip).src = "images/ToolTipLogo_" + imageId + ".gif";
-                        if (currentActiveTooltip == 0)
-                            document.getElementById('toolTipImg_0').style.right = '0';
-                        if (currentActiveTooltip == 1)
-                            document.getElementById('toolTipImg_1').style.left = '0';
-                        if (currentActiveTooltip == 2)
-                            document.getElementById('toolTipImg_2').style.top = '0';
-                        document.getElementById('toolTipText_' + currentActiveTooltip).innerText = message;
-                        document.getElementById('toolTipText_' + currentActiveTooltip).style.display = message && message != '' ? 'block' : 'none';
-                        if (timeout > 0)
-                            window.setTimeout(function () { hideTooltip(); }, timeout);
-                    });
-            });
+    function showTooltip(message, imageId) {
+        document.getElementById('toolTipImgSrc').src = "images/ToolTipLogo_" + imageId + ".gif";
+        document.getElementById('toolTipImg').style.left = '0';
+        document.getElementById('toolTipText').innerHTML = message;
+        document.getElementById('toolTipText').style.display = message && message != '' ? 'block' : 'none';
     }
 
     function hideTooltip() {
-        if (currentActiveTooltip == undefined || isHidingTooltip == undefined || isShowingTooltip == undefined || isHidingTooltip)
-            return;
-        isHidingTooltip = true;
-        if (currentActiveTooltip == 0)
-            document.getElementById('toolTipImg_0').style.right = '-100%';
-        if (currentActiveTooltip == 1)
-            document.getElementById('toolTipImg_1').style.left = '-120%';
-        if (currentActiveTooltip == 2)
-            document.getElementById('toolTipImg_2').style.top = '-100%';
-        document.getElementById('toolTipText_' + currentActiveTooltip).innerText = '';
-        document.getElementById('toolTipText_' + currentActiveTooltip).style.display = 'none';
-
-        window.setTimeout(function () { isShowingTooltip = false; isHidingTooltip = false; }, 700);
+        document.getElementById('toolTipImg').style.left = '-120%';
+        document.getElementById('toolTipText').innerHTML = '';
+        document.getElementById('toolTipText').style.display = 'none';
     }
 
-    document.getElementById('toolTipImg_0').addEventListener('click', function () { hideTooltip(); });
-    document.getElementById('toolTipImg_1').addEventListener('click', function () { hideTooltip(); });
-    document.getElementById('toolTipImg_2').addEventListener('click', function () { hideTooltip(); });
+    document.getElementById('toolTipImgSrc').addEventListener('click', function () { DotNet.invokeMethodAsync('ru.rikale.mobile', 'HideAlert'); });
 </script>

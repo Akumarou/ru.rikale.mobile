@@ -1,0 +1,22 @@
+﻿@page "/timers"
+@using static ru.rikale.mobile.Components.Layout.MainLayout
+@inject IJSRuntime JS
+
+<div class="content">
+    <h1 class="hide header" id="header">Страница "Дейлики" ещё не создана :(</h1>
+</div>
+
+@code{
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+            MainThread.BeginInvokeOnMainThread(async () => await JS.InvokeVoidAsync("slowAppear"));
+    }
+}
+
+<script>
+    function slowAppear() {
+        window.setTimeout(function () { document.getElementById('header').classList.add('show'); }, 500);
+    }
+</script>
